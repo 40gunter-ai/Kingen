@@ -1,11 +1,15 @@
-var CACHE_NAME = 'kingen-v1';
+var CACHE_NAME = 'kingen-v2';
+var GHPATH = '/Kingen';
 var urlsToCache = [
-  './',
-  './index.html',
-  './manifest.json'
+  GHPATH + '/',
+  GHPATH + '/index.html',
+  GHPATH + '/manifest.json',
+  GHPATH + '/icon-192.png',
+  GHPATH + '/icon-512.png'
 ];
 
 self.addEventListener('install', function(event) {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(function(cache) {
       return cache.addAll(urlsToCache);
