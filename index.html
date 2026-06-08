@@ -341,7 +341,7 @@ function save(){localStorage.setItem("kingenData_v29",JSON.stringify({strafronde
 function load(){var data=JSON.parse(localStorage.getItem("kingenData_v29")||"{}");strafrondes=data.strafrondes||[];totals={christophe:0,gunter:0,jessica:0,sandy:0};if(data.totals)for(var p=0;p<players.length;p++)if(data.totals[players[p]]!==undefined)totals[players[p]]=data.totals[players[p]];currentRonde=data.currentRonde||1;currentDatum=data.currentDatum||"";startDelerIndex=(data.startDelerIndex!==undefined&&data.startDelerIndex!==null)?data.startDelerIndex:-1;strafrondeNr=data.strafrondeNr||0;document.getElementById("euroPerPunt").value=data.euroPerPunt||0;var today=vandaag();if(currentDatum&&currentDatum!==today){currentDatum=today;currentRonde=1;strafrondeNr=0;startDelerIndex=-1;}if(!currentDatum)currentDatum=today;berekenTotalen();updateRondeLabel();herbouwTabel();updateTotalsUI();updateRondeTotaalUI();updateDelerUI();updateTroefButtons();updateLockUI();updateCancelBtn();updateEuroInfo();updateRestCounter();if(startDelerIndex>=0)autoSelectRound();}
 
 // PWA Service Worker
-if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(function(){});}
+if("serviceWorker" in navigator){navigator.serviceWorker.register("/Kingen/sw.js",{scope:"/Kingen/"}).catch(function(){});}
 </script>
 </body>
 </html>
