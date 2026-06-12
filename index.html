@@ -20,6 +20,8 @@ button { padding: 15px; margin: 6px; font-size: 16px; border-radius: 10px; borde
 .dangerBtn { background-color: #b33a3a; }
 .goodBtn { background-color: #2d8a62; }
 .overviewBtn { background-color: #8a5cd0; }
+.statsBtn { background-color: #c2185b; }
+.spelregelsBtn { background-color: #1a8a6a; font-size: 13px; padding: 8px 14px; }
 .newRoundBtn { background-color: #e6a817; color: black; font-weight: bold; }
 .exportBtn { background-color: #217346; }
 .adminBtn { background-color: #555; font-size: 13px; padding: 8px 14px; }
@@ -81,50 +83,39 @@ td, th { border: 1px solid white; padding: 8px; }
 .rondeHeader span { font-weight: bold; color: #9fb0d0; }
 .winnerCell { background: rgba(76,175,80,0.2); color: #4caf50; font-weight: bold; }
 .errorMsg { color: #ff5b6e; font-weight: bold; font-size: 16px; margin-top: 8px; display: none; }
-
-/* LOGIN SCHERM */
-.loginScreen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; }
-.loginBox { background: rgba(255,255,255,0.06); border: 2px solid rgba(230,168,23,0.4); border-radius: 20px; padding: 40px 30px; max-width: 380px; width: 100%; }
-.loginBox h1 { font-size: 48px; margin: 0 0 10px 0; }
-.loginBox h2 { margin: 0 0 20px 0; color: #e6a817; }
-.loginInput { width: 100%; box-sizing: border-box; padding: 14px; font-size: 18px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.3); background: #0b1f3a; color: white; text-align: center; margin-bottom: 12px; }
-.loginInput:focus { border-color: #e6a817; outline: none; }
-.loginBtn { width: 100%; padding: 14px; font-size: 18px; font-weight: bold; background: #e6a817; color: black; border: none; border-radius: 10px; cursor: pointer; }
-.loginBtn:hover { background: #d4960f; }
-.loginError { color: #ff5b6e; font-weight: bold; margin-top: 10px; display: none; }
+.statCard { margin: 12px 0; padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); text-align: left; }
+.statCard h3 { margin: 0 0 12px 0; font-size: 16px; }
+.statGrid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; text-align: center; }
+.statPlayer { font-weight: bold; font-size: 14px; color: #e6a817; margin-bottom: 4px; }
+.statValue { font-size: 22px; font-weight: bold; }
+.statLabel { font-size: 11px; color: #9fb0d0; margin-top: 2px; }
+.statHighlight { color: #4caf50; }
+.statLow { color: #ff5b6e; }
+.statBarContainer { height: 20px; background: rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; margin: 4px 0; }
+.statBar { height: 100%; border-radius: 10px; transition: width 0.5s; }
+.wakeLockIndicator { font-size: 12px; color: #4caf50; margin-left: 8px; }
+.regelBlock { margin: 14px 0; padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); text-align: left; }
+.regelBlock h3 { margin: 0 0 10px 0; color: #e6a817; font-size: 16px; }
+.regelBlock p { margin: 6px 0; line-height: 1.5; }
+.regelBlock ul { margin: 6px 0 6px 20px; padding: 0; }
+.regelBlock li { margin: 4px 0; line-height: 1.5; }
+.regelTabel { width: 100%; border-collapse: collapse; margin: 10px 0; }
+.regelTabel td, .regelTabel th { border: 1px solid rgba(255,255,255,0.2); padding: 8px 10px; text-align: left; }
+.regelTabel th { background: rgba(255,255,255,0.08); color: #e6a817; }
+.regelTabel tr:nth-child(even) { background: rgba(255,255,255,0.03); }
 </style>
 </head>
 <body>
 
-<!-- ============================= -->
-<!-- LOGIN SCHERM                  -->
-<!-- ============================= -->
-<div id="loginScreen" class="loginScreen">
-    <div class="loginBox">
-        <h1>🃏</h1>
-        <h2>Kingen Score</h2>
-        <p style="color:#9fb0d0; margin-bottom:20px;">Voer het wachtwoord in om verder te gaan</p>
-        <input type="password" class="loginInput" id="pwInput" placeholder="Wachtwoord..." onkeydown="if(event.key==='Enter')checkLogin()">
-        <button class="loginBtn" onclick="checkLogin()">🔓 Inloggen</button>
-        <div class="loginError" id="loginError">❌ Fout wachtwoord — probeer opnieuw</div>
-    </div>
-</div>
-
-<!-- ============================= -->
-<!-- APP CONTENT (verborgen tot login) -->
-<!-- ============================= -->
-<div id="appContent" style="display:none;">
-
-<h2>Kingen Score</h2>
-
+<h2>Kingen Score <span class="wakeLockIndicator" id="wakeLockIndicator"></span></h2>
 <div class="box">
     <div class="row" style="align-items:center;">
         <div style="font-size:18px; font-weight:bold;" id="rondeLabel">Ronde 1</div>
         <button class="newRoundBtn" onclick="nieuweRonde()">Nieuwe ronde</button>
         <button class="overviewBtn" onclick="toonOverzicht()">Score overzicht</button>
+        <button class="statsBtn" onclick="toonStatistieken()">📊 Statistieken</button>
     </div>
 </div>
-
 <div class="euroBox">
     <div class="row" style="align-items:center; gap:12px;">
         <span class="euroLabel">💰 Euro per punt:</span>
@@ -133,7 +124,6 @@ td, th { border: 1px solid white; padding: 8px; }
     </div>
     <div id="euroInfo" style="margin-top:8px; font-size:14px; color:#9fb0d0;">Stel een bedrag in — wordt vastgelegd bij het afsluiten van elke strafronde</div>
 </div>
-
 <div class="dealerBox" id="dealerBox">
     <div class="sectionLabel">Wie deelt eerst?</div>
     <div class="row" id="dealerKeuze">
@@ -144,11 +134,13 @@ td, th { border: 1px solid white; padding: 8px; }
     </div>
     <div class="dealerInfo" id="dealerInfo"></div>
 </div>
-
 <div class="box">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
         <div class="sectionLabel">Strafrondes</div>
-        <button class="adminBtn" id="adminBtn" onclick="toggleAdmin()">🔓 Administrator</button>
+        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+            <button class="spelregelsBtn" id="spelregelsBtn" onclick="toonSpelregels()" style="display:none;">📜 Spelregels</button>
+            <button class="adminBtn" id="adminBtn" onclick="toggleAdmin()">🔓 Administrator</button>
+        </div>
     </div>
     <div class="row">
         <button class="contract locked" id="btn_least" onclick="selectRound('least', this)">Minste slagen</button>
@@ -156,7 +148,7 @@ td, th { border: 1px solid white; padding: 8px; }
         <button class="contract locked" id="btn_queens" onclick="selectRound('queens', this)">Dames</button>
         <button class="contract locked" id="btn_mix" onclick="selectRound('mix', this)">Heren en boeren</button>
         <button class="contract locked" id="btn_kingHeart" onclick="selectRound('kingHeart', this)">Harten heer</button>
-        <button class="contract locked" id="btn_sevenlast" onclick="selectRound('sevenlast', this)">7st &amp; laatste</button>
+        <button class="contract locked" id="btn_sevenlast" onclick="selectRound('sevenlast', this)">7de &amp; laatste</button>
     </div>
     <div class="sectionLabel" style="margin-top:12px;">Troefrondes — deler kiest troef (+1 per slag)</div>
     <div class="row">
@@ -169,7 +161,6 @@ td, th { border: 1px solid white; padding: 8px; }
     <div class="lockMsg" id="lockMsg"></div>
     <div class="completeMsg" id="completeMsg" style="display:none;">✅ Alle 10 rondes gespeeld! Start een nieuwe ronde.</div>
 </div>
-
 <div class="box" id="tapBox" style="display:none;">
     <div class="muted" id="tapHint">Gebruik + en - om de score per speler aan te passen.</div>
     <div class="row" id="subBox" style="display:none; margin-top:10px;">
@@ -194,7 +185,6 @@ td, th { border: 1px solid white; padding: 8px; }
     </div>
     <div class="errorMsg" id="errorMsg"></div>
 </div>
-
 <h3 id="tabelTitel">Ronde 1</h3>
 <table id="table">
 <tr><th>Strafronde</th><th>Deler</th><th>Christoph</th><th>Gunter</th><th>Jess</th><th>Sandy</th></tr>
@@ -205,7 +195,7 @@ td, th { border: 1px solid white; padding: 8px; }
 <h3>Eindtotaal (alle rondes)</h3>
 <p id="total"></p>
 <p id="totalEuro"></p>
-
+<!-- SCORE OVERZICHT -->
 <div class="overlay" id="overlay">
     <div class="overlayContent">
         <div class="row" style="justify-content:space-between; align-items:center;">
@@ -218,73 +208,121 @@ td, th { border: 1px solid white; padding: 8px; }
         <div id="overzichtContent"></div>
     </div>
 </div>
-
-</div><!-- einde appContent -->
+<!-- STATISTIEKEN -->
+<div class="overlay" id="statsOverlay">
+    <div class="overlayContent">
+        <div class="row" style="justify-content:space-between; align-items:center;">
+            <h2>📊 Statistieken</h2>
+            <button class="smallBtn dangerBtn" onclick="sluitStatistieken()">Sluiten</button>
+        </div>
+        <div id="statsContent"></div>
+    </div>
+</div>
+<!-- SPELREGELS -->
+<div class="overlay" id="spelregelsOverlay">
+    <div class="overlayContent">
+        <div class="row" style="justify-content:space-between; align-items:center;">
+            <h2>📜 Spelregels Kingen</h2>
+            <button class="smallBtn dangerBtn" onclick="sluitSpelregels()">Sluiten</button>
+        </div>
+        <div class="regelBlock">
+            <h3>🃏 Overzicht</h3>
+            <p>Kingen wordt gespeeld met <strong>4 spelers</strong> en een <strong>standaard kaartspel van 52 kaarten</strong>. Elke ronde bestaat uit <strong>10 strafrondes</strong>: 6 strafrondes + 4 troefrondes. Elke speler krijgt <strong>13 kaarten</strong>.</p>
+            <p>De speler met de <strong>hoogste totaalscore</strong> (minst negatief) aan het einde wint!</p>
+        </div>
+        <div class="regelBlock">
+            <h3>🔄 Deler</h3>
+            <p>Bij het begin van een ronde wordt een <strong>eerste deler</strong> gekozen. De beurt om te delen schuift elke strafronde <strong>met de klok mee</strong> door naar de volgende speler.</p>
+            <p>De speler <strong>links van de deler</strong> speelt de eerste kaart (komt uit).</p>
+        </div>
+        <div class="regelBlock">
+            <h3>⛔ Strafrondes (ronde 1–6)</h3>
+            <p>Bij strafrondes krijg je <strong>minpunten</strong>. Het doel is om zo weinig mogelijk strafpunten te pakken.</p>
+            <table class="regelTabel">
+                <tr><th>#</th><th>Strafronde</th><th>Straf</th><th>Totaal</th></tr>
+                <tr><td>1</td><td>Minste slagen</td><td><strong>-1</strong> per gewonnen slag</td><td>-13</td></tr>
+                <tr><td>2</td><td>Harten</td><td><strong>-1</strong> per hartkaart in je slagen</td><td>-13</td></tr>
+                <tr><td>3</td><td>Dames</td><td><strong>-2</strong> per dame in je slagen</td><td>-8</td></tr>
+                <tr><td>4</td><td>Heren en boeren</td><td><strong>-1</strong> per heer of boer in je slagen</td><td>-8</td></tr>
+                <tr><td>5</td><td>Harten heer</td><td><strong>-5</strong> voor wie de harten heer pakt</td><td>-5</td></tr>
+                <tr><td>6</td><td>7de &amp; laatste</td><td><strong>-2</strong> voor de 7de slag, <strong>-3</strong> voor de laatste (13de) slag</td><td>-5</td></tr>
+            </table>
+        </div>
+        <div class="regelBlock">
+            <h3>🏆 Troefrondes (ronde 7–10)</h3>
+            <p>Bij troefrondes krijg je <strong>pluspunten</strong>. Het doel is om zoveel mogelijk slagen te winnen.</p>
+            <table class="regelTabel">
+                <tr><th>#</th><th>Troefronde</th><th>Punten</th><th>Totaal</th></tr>
+                <tr><td>7</td><td>Troefronde 7</td><td><strong>+1</strong> per gewonnen slag</td><td>+13</td></tr>
+                <tr><td>8</td><td>Troefronde 8</td><td><strong>+1</strong> per gewonnen slag</td><td>+13</td></tr>
+                <tr><td>9</td><td>Troefronde 9</td><td><strong>+1</strong> per gewonnen slag</td><td>+13</td></tr>
+                <tr><td>10</td><td>Troefronde 10</td><td><strong>+1</strong> per gewonnen slag</td><td>+13</td></tr>
+            </table>
+            <p>Bij elke troefronde kiest de <strong>deler</strong> de troefkleur (♠ ♥ ♦ ♣). Troef wint altijd van andere kleuren.</p>
+        </div>
+        <div class="regelBlock">
+            <h3>📏 Basisregels</h3>
+            <ul>
+                <li>Je moet altijd <strong>kleur bekennen</strong> (dezelfde kleur bijleggen als de uitgespeelde kaart).</li>
+                <li>Kun je niet kleur bekennen? Dan mag je een <strong>andere kleur</strong> bijleggen (of troef bij troefrondes).</li>
+                <li>De <strong>hoogste kaart</strong> van de uitgespeelde kleur wint de slag (of de hoogste troef als er troef is gespeeld).</li>
+                <li>De winnaar van een slag speelt de <strong>volgende kaart</strong> uit.</li>
+            </ul>
+        </div>
+        <div class="regelBlock">
+            <h3>🔢 Kaartwaarde (hoog → laag)</h3>
+            <p><strong>Aas</strong> (hoogste) → Heer → Dame → Boer → 10 → 9 → 8 → 7 → 6 → 5 → 4 → 3 → <strong>2</strong> (laagste)</p>
+        </div>
+        <div class="regelBlock">
+            <h3>💰 Euro per punt (optioneel)</h3>
+            <p>Stel een bedrag in per punt. Het bedrag wordt <strong>vastgelegd bij het afsluiten</strong> van elke strafronde. Je kunt het bedrag tussendoor wijzigen — eerdere rondes behouden hun vastgelegde bedrag.</p>
+        </div>
+        <div class="regelBlock">
+            <h3>📊 Puntentelling samengevat</h3>
+            <table class="regelTabel">
+                <tr><th>Type</th><th>Punten</th><th>Doel</th></tr>
+                <tr><td>Strafrondes (1–6)</td><td>Minpunten</td><td>Zo <strong>weinig</strong> mogelijk pakken</td></tr>
+                <tr><td>Troefrondes (7–10)</td><td>Pluspunten</td><td>Zo <strong>veel</strong> mogelijk pakken</td></tr>
+            </table>
+            <p style="margin-top:10px;">De speler met de <strong>hoogste eindscore</strong> (minst negatief / meest positief) wint de ronde! 🏆</p>
+        </div>
+    </div>
+</div>
 
 <script>
-// ===========================
-// LOGIN SYSTEEM
-// ===========================
-var _k=[83,50,70,117,89,87,82,104,97,50,108,117,90,119,61,61];
-function _d(){var s="";for(var i=0;i<_k.length;i++)s+=String.fromCharCode(_k[i]);return atob(s);}
-
-function checkLogin(){
-    var pw=document.getElementById("pwInput").value;
-    if(pw===_d()){
-        sessionStorage.setItem("kingenAuth","1");
-        showApp();
-    } else {
-        document.getElementById("loginError").style.display="block";
-        document.getElementById("pwInput").value="";
-        document.getElementById("pwInput").focus();
-        setTimeout(function(){document.getElementById("loginError").style.display="none";},3000);
-    }
-}
-
-function showApp(){
-    document.getElementById("loginScreen").style.display="none";
-    document.getElementById("appContent").style.display="block";
-    load();
-}
-
-// Auto-login als sessie nog actief is
-if(sessionStorage.getItem("kingenAuth")==="1"){
-    showApp();
-}
-
-// ===========================
-// APP LOGICA
-// ===========================
+// WAKE LOCK
+var wakeLock=null;
+async function requestWakeLock(){try{if("wakeLock" in navigator){wakeLock=await navigator.wakeLock.request("screen");document.getElementById("wakeLockIndicator").innerText="🌙 Scherm aan";wakeLock.addEventListener("release",function(){document.getElementById("wakeLockIndicator").innerText="";});}}catch(e){document.getElementById("wakeLockIndicator").innerText="";}}
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"){requestWakeLock();}});
+// APP
 var players=["christophe","gunter","jessica","sandy"];
 var playerNames={christophe:"Christoph",gunter:"Gunter",jessica:"Jess",sandy:"Sandy"};
 var rondeVolgorde=["least","hearts","queens","mix","kingHeart","sevenlast","troef1","troef2","troef3","troef4"];
 var rules={least:-1,hearts:-1,queens:-2,mix:-1,kingHeart:-5,troef1:1,troef2:1,troef3:1,troef4:1};
 var sevenLastRules={seventh:-2,last:-3};
-var baseRoundLabels={least:"Minste slagen",hearts:"Harten",queens:"Dames",mix:"Heren en boeren",kingHeart:"Harten heer",sevenlast:"7st & laatste"};
+var baseRoundLabels={least:"Minste slagen",hearts:"Harten",queens:"Dames",mix:"Heren en boeren",kingHeart:"Harten heer",sevenlast:"7de & laatste"};
 var verwachtTotaal={least:-13,hearts:-13,queens:-8,mix:-8,kingHeart:-5,sevenlast:-5,troef1:13,troef2:13,troef3:13,troef4:13};
 var resterendLabel={least:"slagen",hearts:"hartenpunten",queens:"damespunten",mix:"heren/boerenpunten",kingHeart:"punten (harten heer)",sevenlast:"punten",troef1:"slagen",troef2:"slagen",troef3:"slagen",troef4:"slagen"};
 function vandaag(){var d=new Date();return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear();}
-
 var selected=null,subMode="seventh",current=null;
 var currentRonde=1,currentDatum="",strafrondes=[];
 var totals={christophe:0,gunter:0,jessica:0,sandy:0};
 var openDatums={},startDelerIndex=-1,strafrondeNr=0;
-
 function getEuroPerPunt(){var val=parseFloat(document.getElementById("euroPerPunt").value);return isNaN(val)?0:val;}
 function saveEuro(){save();updateEuroInfo();}
 function updateEuroInfo(){var epp=getEuroPerPunt();document.getElementById("euroInfo").innerText=epp>0?"Volgende strafronde: €"+epp.toFixed(2)+" per punt (vastgelegd bij afsluiten)":"Stel een bedrag in — wordt vastgelegd bij het afsluiten van elke strafronde";}
 function berekenEuroVoorItems(items){var euro=[0,0,0,0];for(var i=0;i<items.length;i++){var epp=items[i].epp||0;for(var p=0;p<4;p++)euro[p]+=items[i].scores[p]*epp;}return euro;}
 function heeftEuroData(items){for(var i=0;i<items.length;i++)if((items[i].epp||0)>0)return true;return false;}
 function euroTekstVanItems(items){var euro=berekenEuroVoorItems(items);if(!heeftEuroData(items))return "";var parts=[];for(var p=0;p<4;p++){var cls=euro[p]>=0?"color:#4caf50":"color:#ff5b6e";var tk=euro[p]>=0?"+":"−";parts.push(playerNames[players[p]]+": <span style='"+cls+";font-weight:bold;'>"+tk+"€"+Math.abs(euro[p]).toFixed(2)+"</span>");}return parts.join(" | ");}
-
 function updateRestCounter(){var el=document.getElementById("restCounter");if(!current){el.style.display="none";return;}var verwacht=verwachtTotaal[current.type];if(verwacht===undefined){el.style.display="none";return;}var huidigTotaal=0;for(var p=0;p<players.length;p++)huidigTotaal+=current.scores[players[p]];var resterend=verwacht-huidigTotaal;var label=resterendLabel[current.type]||"punten";var absResterend=Math.abs(resterend);var absVerwacht=Math.abs(verwacht);el.style.display="block";if(resterend===0){el.className="restCounter restOk";el.innerHTML="✅ Alle "+absVerwacht+" "+label+" verdeeld!";}else if((verwacht<0&&resterend<0)||(verwacht>0&&resterend>0)){el.className="restCounter restOpen";el.innerHTML="📊 Nog <strong>"+absResterend+"</strong> van "+absVerwacht+" "+label;}else{el.className="restCounter restFout";el.innerHTML="⚠️ Te veel! +"+absResterend+" "+label;}}
-
 var adminMode=false;
-function toggleAdmin(){adminMode=!adminMode;var btn=document.getElementById("adminBtn");if(adminMode){btn.classList.add("adminActive");btn.innerText="🔓 Admin AAN";}else{btn.classList.remove("adminActive");btn.innerText="🔓 Administrator";}updateLockUI();updateCancelBtn();}
+function toggleAdmin(){adminMode=!adminMode;var btn=document.getElementById("adminBtn");if(adminMode){btn.classList.add("adminActive");btn.innerText="🔓 Admin AAN";}else{btn.classList.remove("adminActive");btn.innerText="🔓 Administrator";}updateLockUI();updateCancelBtn();updateSpelregelsBtn();}
 function updateLockUI(){var allBtns=document.querySelectorAll(".contract, .troef");for(var i=0;i<allBtns.length;i++){if(adminMode)allBtns[i].classList.remove("locked");else if(!allBtns[i].classList.contains("active"))allBtns[i].classList.add("locked");}}
 function isButtonAllowed(type){if(adminMode)return true;if(startDelerIndex<0)return false;if(strafrondeNr<rondeVolgorde.length&&rondeVolgorde[strafrondeNr]===type)return true;return false;}
 function updateCancelBtn(){document.getElementById("cancelBtn").style.display=adminMode?"block":"none";}
-
+function updateSpelregelsBtn(){document.getElementById("spelregelsBtn").style.display=adminMode?"inline-block":"none";}
+function toonSpelregels(){document.getElementById("spelregelsOverlay").style.display="block";}
+function sluitSpelregels(){document.getElementById("spelregelsOverlay").style.display="none";}
 function isTroef(t){return t==="troef1"||t==="troef2"||t==="troef3"||t==="troef4";}
 function delerIndexVoorPositie(pos){if(startDelerIndex<0)return -1;return(startDelerIndex+pos)%players.length;}
 function huidigeDelerIndex(){return delerIndexVoorPositie(strafrondeNr);}
@@ -292,13 +330,10 @@ function delerNaamVoorPositie(pos){var idx=delerIndexVoorPositie(pos);return idx
 function getRondeLabel(type,pos){if(isTroef(type))return "Troef "+delerNaamVoorPositie(pos)+" (ronde "+(pos+1)+")";return baseRoundLabels[type]||type;}
 function updateTroefButtons(){for(var i=0;i<4;i++){var btn=document.getElementById("btn_troef"+(i+1));if(btn)btn.innerText=(startDelerIndex>=0)?"Troef "+delerNaamVoorPositie(6+i):"Troefronde "+(7+i);}}
 function telStrafrondesHuidigeRonde(){var c=0;for(var i=0;i<strafrondes.length;i++)if(strafrondes[i].ronde===currentRonde&&strafrondes[i].datum===currentDatum)c++;return c;}
-
 function kiesDeler(index){startDelerIndex=index;strafrondeNr=telStrafrondesHuidigeRonde();updateDelerUI();updateTroefButtons();save();autoSelectRound();}
 function updateDelerUI(){var btns=document.getElementById("dealerKeuze").getElementsByTagName("button");for(var i=0;i<btns.length;i++)btns[i].classList.remove("dealerActive");if(startDelerIndex>=0){btns[startDelerIndex].classList.add("dealerActive");var naam=playerNames[players[huidigeDelerIndex()]];var tekst="🃏 Deler: "+naam;if(strafrondeNr<rondeVolgorde.length){var vt=rondeVolgorde[strafrondeNr];tekst+=" — "+getRondeLabel(vt,strafrondeNr);if(isTroef(vt))tekst+=" — "+naam+" kiest troef";}document.getElementById("dealerInfo").innerText=tekst;}else document.getElementById("dealerInfo").innerText="Kies wie er eerst deelt";}
-
 function autoSelectRound(){var allBtns=document.querySelectorAll(".contract, .troef");for(var i=0;i<allBtns.length;i++)allBtns[i].classList.remove("active");updatePlayedButtons();updateTroefButtons();if(strafrondeNr>=rondeVolgorde.length){document.getElementById("completeMsg").style.display="block";document.getElementById("tapBox").style.display="none";document.getElementById("subBox").style.display="none";current=null;selected=null;updateModeText();updateTapScores();updateRestCounter();updateLockUI();return;}document.getElementById("completeMsg").style.display="none";var btn=document.getElementById("btn_"+rondeVolgorde[strafrondeNr]);if(btn){btn.classList.remove("locked");selectRound(rondeVolgorde[strafrondeNr],btn);}updateLockUI();}
 function updatePlayedButtons(){var gespeeld=[];for(var i=0;i<strafrondes.length;i++){if(strafrondes[i].ronde===currentRonde&&strafrondes[i].datum===currentDatum)gespeeld.push(strafrondes[i].typeKey||"");}for(var v=0;v<rondeVolgorde.length;v++){var btn=document.getElementById("btn_"+rondeVolgorde[v]);if(btn)btn.classList.toggle("played",gespeeld.indexOf(rondeVolgorde[v])>=0);}}
-
 function berekenTotalen(){totals={christophe:0,gunter:0,jessica:0,sandy:0};for(var i=0;i<strafrondes.length;i++)for(var p=0;p<players.length;p++)totals[players[p]]+=strafrondes[i].scores[p];}
 function updateTotalsUI(){var parts=[];for(var p=0;p<players.length;p++)parts.push(playerNames[players[p]]+": "+totals[players[p]]);document.getElementById("total").innerText=parts.join(" | ");var euroTekst=euroTekstVanItems(strafrondes);document.getElementById("totalEuro").innerHTML=euroTekst?"💰 "+euroTekst:"";}
 function updateRondeTotaalUI(){var rt={};for(var p=0;p<players.length;p++)rt[players[p]]=0;var rondeItems=[];for(var i=0;i<strafrondes.length;i++){if(strafrondes[i].ronde===currentRonde&&strafrondes[i].datum===currentDatum){for(var p=0;p<players.length;p++)rt[players[p]]+=strafrondes[i].scores[p];rondeItems.push(strafrondes[i]);}}var parts=[];for(var p=0;p<players.length;p++)parts.push(playerNames[players[p]]+": "+rt[players[p]]);document.getElementById("rondeTotaal").innerText=parts.join(" | ");var euroTekst=euroTekstVanItems(rondeItems);document.getElementById("rondeTotaalEuro").innerHTML=euroTekst?"💰 "+euroTekst:"";}
@@ -311,37 +346,32 @@ function verbergError(){document.getElementById("errorMsg").style.display="none"
 function bepaalWinnaarIndexen(arr){var mx=arr[0];for(var i=1;i<arr.length;i++)if(arr[i]>mx)mx=arr[i];var w=[];for(var i=0;i<arr.length;i++)if(arr[i]===mx)w.push(i);return w;}
 function isWinnaar(wA,idx){for(var i=0;i<wA.length;i++)if(wA[i]===idx)return true;return false;}
 function winnaarNamen(wA){var n=[];for(var i=0;i<wA.length;i++)n.push(playerNames[players[wA[i]]]);return n.join(" & ");}
-
 function selectRound(type,btn){if(!isButtonAllowed(type)){var el=document.getElementById("lockMsg");el.innerText="🔒 Vergrendeld — kies eerst een deler of gebruik Administrator";el.style.display="block";setTimeout(function(){el.style.display="none";},3000);return;}selected=type;verbergError();document.getElementById("lockMsg").style.display="none";document.getElementById("completeMsg").style.display="none";var allBtns=document.querySelectorAll(".contract, .troef");for(var i=0;i<allBtns.length;i++)allBtns[i].classList.remove("active");btn.classList.add("active");current={type:type,label:getRondeLabel(type,strafrondeNr),scores:{christophe:0,gunter:0,jessica:0,sandy:0}};if(type==="sevenlast"){document.getElementById("subBox").style.display="flex";document.getElementById("tapHint").innerText="Kies 7de of laatste, gebruik dan + en - per speler.";subMode="seventh";setSub("seventh");}else{document.getElementById("subBox").style.display="none";if(isTroef(type)){var dn=(startDelerIndex>=0)?playerNames[players[huidigeDelerIndex()]]:"?";document.getElementById("tapHint").innerText="🃏 "+dn+" deelt en kiest troef! Gebruik + voor elke gewonnen slag.";}else document.getElementById("tapHint").innerText="Gebruik + en - om de score per speler aan te passen.";}document.getElementById("tapBox").style.display="block";updateModeText();updateTapScores();updateRestCounter();}
-
 function setSub(mode){subMode=mode;document.getElementById("btnSeventh").classList.remove("subActive");document.getElementById("btnLast").classList.remove("subActive");(mode==="last"?document.getElementById("btnLast"):document.getElementById("btnSeventh")).classList.add("subActive");updateModeText();}
 function getDelta(){if(!current)return 0;if(current.type==="sevenlast")return sevenLastRules[subMode];return rules[current.type]||0;}
-function adjust(pid,dir){if(!current||!selected){alert("Kies eerst een strafronde of troefronde!");return;}verbergError();current.scores[pid]+=(dir===1)?getDelta():-getDelta();updateTapScores();updateRestCounter();}
+function adjust(pid,dir){if(!current||!selected){alert("Kies eerst een strafronde of troefronde!");return;}verbergError();current.scores[pid]+=(dir===1)?getDelta():-getDelta();updateTapScores();updateRestCounter();if(current.type==="sevenlast"&&subMode==="seventh"&&dir===1){setSub("last");}}
 function cancelRound(){if(!current)return;if(!confirm("Huidige ronde annuleren?"))return;current=null;verbergError();document.getElementById("tapBox").style.display="none";document.getElementById("subBox").style.display="none";updateModeText();updateTapScores();updateRestCounter();}
 function valideerScore(){if(!current)return false;var verwacht=verwachtTotaal[current.type];if(verwacht===undefined)return true;var tot=0;for(var p=0;p<players.length;p++)tot+=current.scores[players[p]];if(tot!==verwacht){toonError("⚠️ Score niet correct! Totaal is "+tot+", moet "+verwacht+" zijn.");return false;}return true;}
-
-function finishRound(){if(!current)return;if(!valideerScore())return;if(!currentDatum)currentDatum=vandaag();var delerNaam=(startDelerIndex>=0)?playerNames[players[huidigeDelerIndex()]]:"";var eppNu=getEuroPerPunt();var scoresArr=[];for(var p=0;p<players.length;p++){totals[players[p]]+=current.scores[players[p]];scoresArr.push(current.scores[players[p]]);}strafrondes.push({ronde:currentRonde,datum:currentDatum,label:current.label,typeKey:current.type,scores:scoresArr,deler:delerNaam,epp:eppNu});var row=document.getElementById("table").insertRow();row.insertCell(0).innerText=current.label;row.insertCell(1).innerText=delerNaam;for(var p=0;p<players.length;p++)row.insertCell(p+2).innerText=scoresArr[p];strafrondeNr=telStrafrondesHuidigeRonde();updateDelerUI();updateTotalsUI();updateRondeTotaalUI();save();verbergError();if(adminMode){adminMode=false;document.getElementById("adminBtn").classList.remove("adminActive");document.getElementById("adminBtn").innerText="🔓 Administrator";updateCancelBtn();}autoSelectRound();}
-
-function nieuweRonde(){var today=vandaag();var nieuwNr,tekst;if(today!==currentDatum){currentDatum=today;nieuwNr=1;startDelerIndex=-1;tekst="Nieuwe speeldag! Ronde 1 op "+today+" starten?";}else{nieuwNr=currentRonde+1;tekst="Nieuwe ronde starten? (Ronde "+nieuwNr+")";}if(!confirm(tekst))return;currentRonde=nieuwNr;if(today===currentDatum&&startDelerIndex>=0)startDelerIndex=(startDelerIndex+1)%players.length;strafrondeNr=0;current=null;selected=null;verbergError();adminMode=false;document.getElementById("adminBtn").classList.remove("adminActive");document.getElementById("adminBtn").innerText="🔓 Administrator";updateCancelBtn();document.getElementById("tapBox").style.display="none";document.getElementById("subBox").style.display="none";document.getElementById("completeMsg").style.display="none";updateRondeLabel();herbouwTabel();updateModeText();updateRondeTotaalUI();updateTapScores();updateRestCounter();updateDelerUI();updateTroefButtons();updateLockUI();save();if(startDelerIndex>=0)autoSelectRound();}
-
+function finishRound(){if(!current)return;if(!valideerScore())return;if(!currentDatum)currentDatum=vandaag();var delerNaam=(startDelerIndex>=0)?playerNames[players[huidigeDelerIndex()]]:"";var eppNu=getEuroPerPunt();var scoresArr=[];for(var p=0;p<players.length;p++){totals[players[p]]+=current.scores[players[p]];scoresArr.push(current.scores[players[p]]);}strafrondes.push({ronde:currentRonde,datum:currentDatum,label:current.label,typeKey:current.type,scores:scoresArr,deler:delerNaam,epp:eppNu});var row=document.getElementById("table").insertRow();row.insertCell(0).innerText=current.label;row.insertCell(1).innerText=delerNaam;for(var p=0;p<players.length;p++)row.insertCell(p+2).innerText=scoresArr[p];strafrondeNr=telStrafrondesHuidigeRonde();updateDelerUI();updateTotalsUI();updateRondeTotaalUI();save();verbergError();if(adminMode){adminMode=false;document.getElementById("adminBtn").classList.remove("adminActive");document.getElementById("adminBtn").innerText="🔓 Administrator";updateCancelBtn();updateSpelregelsBtn();}autoSelectRound();}
+function nieuweRonde(){var today=vandaag();var nieuwNr,tekst;if(today!==currentDatum){currentDatum=today;nieuwNr=1;startDelerIndex=-1;tekst="Nieuwe speeldag! Ronde 1 op "+today+" starten?";}else{nieuwNr=currentRonde+1;tekst="Nieuwe ronde starten? (Ronde "+nieuwNr+")";}if(!confirm(tekst))return;currentRonde=nieuwNr;if(today===currentDatum&&startDelerIndex>=0)startDelerIndex=(startDelerIndex+1)%players.length;strafrondeNr=0;current=null;selected=null;verbergError();adminMode=false;document.getElementById("adminBtn").classList.remove("adminActive");document.getElementById("adminBtn").innerText="🔓 Administrator";updateCancelBtn();updateSpelregelsBtn();document.getElementById("tapBox").style.display="none";document.getElementById("subBox").style.display="none";document.getElementById("completeMsg").style.display="none";updateRondeLabel();herbouwTabel();updateModeText();updateRondeTotaalUI();updateTapScores();updateRestCounter();updateDelerUI();updateTroefButtons();updateLockUI();save();if(startDelerIndex>=0)autoSelectRound();}
 function undoStrafRonde(){if(strafrondes.length===0)return;var last=strafrondes[strafrondes.length-1];if(last.ronde!==currentRonde||last.datum!==currentDatum){alert("Geen rondes om ongedaan te maken in deze ronde.");return;}strafrondes.pop();for(var p=0;p<players.length;p++)totals[players[p]]-=last.scores[p];strafrondeNr=telStrafrondesHuidigeRonde();herbouwTabel();updateTotalsUI();updateRondeTotaalUI();updateDelerUI();save();autoSelectRound();}
-
-function resetGame(){if(!confirm("Volledige ronde resetten?\n(Score overzicht blijft behouden)"))return;currentRonde++;startDelerIndex=-1;strafrondeNr=0;current=null;selected=null;verbergError();adminMode=false;document.getElementById("adminBtn").classList.remove("adminActive");document.getElementById("adminBtn").innerText="🔓 Administrator";updateCancelBtn();document.getElementById("tapBox").style.display="none";document.getElementById("subBox").style.display="none";document.getElementById("completeMsg").style.display="none";var allBtns=document.querySelectorAll(".contract, .troef");for(var i=0;i<allBtns.length;i++){allBtns[i].classList.remove("active");allBtns[i].classList.remove("played");}updateRondeLabel();herbouwTabel();updateModeText();updateTotalsUI();updateRondeTotaalUI();updateTapScores();updateRestCounter();updateDelerUI();updateTroefButtons();updateLockUI();save();}
-
+function resetGame(){if(!confirm("Volledige ronde resetten?\n(Score overzicht blijft behouden)"))return;currentRonde++;startDelerIndex=-1;strafrondeNr=0;current=null;selected=null;verbergError();adminMode=false;document.getElementById("adminBtn").classList.remove("adminActive");document.getElementById("adminBtn").innerText="🔓 Administrator";updateCancelBtn();updateSpelregelsBtn();document.getElementById("tapBox").style.display="none";document.getElementById("subBox").style.display="none";document.getElementById("completeMsg").style.display="none";var allBtns=document.querySelectorAll(".contract, .troef");for(var i=0;i<allBtns.length;i++){allBtns[i].classList.remove("active");allBtns[i].classList.remove("played");}updateRondeLabel();herbouwTabel();updateModeText();updateTotalsUI();updateRondeTotaalUI();updateTapScores();updateRestCounter();updateDelerUI();updateTroefButtons();updateLockUI();save();}
 function wisRonde(datum,rondeNr){if(!confirm("Ronde "+rondeNr+" ("+datum+") volledig wissen?\nDit kan niet ongedaan gemaakt worden."))return;strafrondes=strafrondes.filter(function(sr){return!(sr.datum===datum&&sr.ronde===rondeNr);});var oudeNummers=[];for(var i=0;i<strafrondes.length;i++){if(strafrondes[i].datum===datum&&oudeNummers.indexOf(strafrondes[i].ronde)===-1)oudeNummers.push(strafrondes[i].ronde);}oudeNummers.sort(function(a,b){return a-b;});var mapping={};for(var i=0;i<oudeNummers.length;i++)mapping[oudeNummers[i]]=i+1;for(var i=0;i<strafrondes.length;i++){if(strafrondes[i].datum===datum&&mapping[strafrondes[i].ronde]!==undefined)strafrondes[i].ronde=mapping[strafrondes[i].ronde];}if(datum===currentDatum){if(mapping[currentRonde]!==undefined)currentRonde=mapping[currentRonde];else{currentRonde=oudeNummers.length+1;if(currentRonde<1)currentRonde=1;}}berekenTotalen();strafrondeNr=telStrafrondesHuidigeRonde();updateRondeLabel();herbouwTabel();updateTotalsUI();updateRondeTotaalUI();updateDelerUI();updateTroefButtons();save();toonOverzicht();}
-
 function exportExcel(){var sep=";";var rows=[];var hasEuro=heeftEuroData(strafrondes);var header=["Datum","Ronde","Type","Deler"];for(var p=0;p<4;p++)header.push(playerNames[players[p]]);header.push("Winnaar");if(hasEuro){header.push("€/punt");for(var p=0;p<4;p++)header.push("€ "+playerNames[players[p]]);}rows.push(header.join(sep));var datums=[],perDatum={};for(var i=0;i<strafrondes.length;i++){var dat=strafrondes[i].datum||"onbekend";if(!perDatum[dat]){perDatum[dat]=[];datums.push(dat);}perDatum[dat].push(strafrondes[i]);}var eindTotaal=[0,0,0,0];var eindEuro=[0,0,0,0];for(var d=0;d<datums.length;d++){var dat=datums[d];var items=perDatum[dat];var datumTotaal=[0,0,0,0];var datumEuro=[0,0,0,0];var rondesInDatum=[];for(var i=0;i<items.length;i++){if(rondesInDatum.indexOf(items[i].ronde)===-1)rondesInDatum.push(items[i].ronde);}rondesInDatum.sort(function(a,b){return a-b;});for(var r=0;r<rondesInDatum.length;r++){var rn=rondesInDatum[r];var rondeTotaal=[0,0,0,0];var rondeEuro=[0,0,0,0];for(var i=0;i<items.length;i++){if(items[i].ronde!==rn)continue;var rij=[dat,rn,items[i].label,items[i].deler||""];var epp=items[i].epp||0;for(var p=0;p<4;p++){rij.push(items[i].scores[p]);rondeTotaal[p]+=items[i].scores[p];rondeEuro[p]+=items[i].scores[p]*epp;}rij.push("");if(hasEuro){rij.push(epp.toFixed(2));for(var p=0;p<4;p++)rij.push((items[i].scores[p]*epp).toFixed(2));}rows.push(rij.join(sep));}var rw=bepaalWinnaarIndexen(rondeTotaal);var totRij=[dat,rn,"TOTAAL RONDE "+rn,""];for(var p=0;p<4;p++){totRij.push(rondeTotaal[p]);datumTotaal[p]+=rondeTotaal[p];datumEuro[p]+=rondeEuro[p];}totRij.push(winnaarNamen(rw)+" \uD83C\uDFC6");if(hasEuro){totRij.push("");for(var p=0;p<4;p++)totRij.push(rondeEuro[p].toFixed(2));}rows.push(totRij.join(sep));rows.push("");}var dw=bepaalWinnaarIndexen(datumTotaal);var datRij=[dat,"","TOTAAL "+dat,""];for(var p=0;p<4;p++){datRij.push(datumTotaal[p]);eindTotaal[p]+=datumTotaal[p];eindEuro[p]+=datumEuro[p];}datRij.push(winnaarNamen(dw)+" \uD83C\uDFC6");if(hasEuro){datRij.push("");for(var p=0;p<4;p++)datRij.push(datumEuro[p].toFixed(2));}rows.push(datRij.join(sep));rows.push("");}var ew=bepaalWinnaarIndexen(eindTotaal);var eindRij=["","","EINDTOTAAL",""];for(var p=0;p<4;p++)eindRij.push(eindTotaal[p]);eindRij.push(winnaarNamen(ew)+" \uD83C\uDFC6");if(hasEuro){eindRij.push("");for(var p=0;p<4;p++)eindRij.push(eindEuro[p].toFixed(2));}rows.push(eindRij.join(sep));var csvContent="\uFEFF"+rows.join("\n");var blob=new Blob([csvContent],{type:"text/csv;charset=utf-8;"});var url=URL.createObjectURL(blob);var a=document.createElement("a");a.href=url;a.download="kingen_scores_"+vandaag().replace(/\//g,"-")+".csv";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
-
 function toggleDatum(datum){if(openDatums[datum]===undefined)openDatums[datum]=false;else openDatums[datum]=!openDatums[datum];toonOverzicht();}
-
 function toonOverzicht(){var html="";var datums=[],perDatum={};for(var i=0;i<strafrondes.length;i++){var dat=strafrondes[i].datum||"onbekend";if(!perDatum[dat]){perDatum[dat]=[];datums.push(dat);}perDatum[dat].push(strafrondes[i]);}if(datums.length===0){html="<p>Nog geen rondes gespeeld.</p>";}else{var eindTotaal=[0,0,0,0];var eindEuro=[0,0,0,0];for(var d=0;d<datums.length;d++){var dat=datums[d];var items=perDatum[dat];var isOpen=(openDatums[dat]===undefined)?true:openDatums[dat];var datumTotaal=[0,0,0,0];var datumEuro=[0,0,0,0];for(var i=0;i<items.length;i++){var epp=items[i].epp||0;for(var p=0;p<4;p++){datumTotaal[p]+=items[i].scores[p];datumEuro[p]+=items[i].scores[p]*epp;}}for(var p=0;p<4;p++){eindTotaal[p]+=datumTotaal[p];eindEuro[p]+=datumEuro[p];}var datumHeeftEuro=heeftEuroData(items);html+='<div class="roundBlock">';html+='<div class="datumHeader" onclick="toggleDatum(\''+dat+'\')">';html+='<h3 style="margin:0;">'+(isOpen?'▼':'▶')+' '+dat+'</h3>';html+='<span class="datumToggle">('+items.length+' rondes)</span></div>';if(isOpen){var rondesInDatum=[];for(var i=0;i<items.length;i++){if(rondesInDatum.indexOf(items[i].ronde)===-1)rondesInDatum.push(items[i].ronde);}rondesInDatum.sort(function(a,b){return a-b;});for(var r=0;r<rondesInDatum.length;r++){var rn=rondesInDatum[r];var rondeTotaal=[0,0,0,0];var rondeEuro=[0,0,0,0];var rondeItems=[];for(var i=0;i<items.length;i++){if(items[i].ronde!==rn)continue;rondeItems.push(items[i]);var epp=items[i].epp||0;for(var p=0;p<4;p++){rondeTotaal[p]+=items[i].scores[p];rondeEuro[p]+=items[i].scores[p]*epp;}}var rw=bepaalWinnaarIndexen(rondeTotaal);var rondeHeeftEuro=heeftEuroData(rondeItems);html+='<div class="rondeHeader"><span>Ronde '+rn+'</span>';html+='<button class="wisRondeBtn" onclick="event.stopPropagation(); wisRonde(\''+dat+'\','+rn+')">🗑 Wis ronde '+rn+'</button></div>';html+='<table style="width:100%;"><tr><th style="text-align:left;">Type</th><th>Deler</th>';for(var p=0;p<4;p++)html+='<th>'+playerNames[players[p]]+'</th>';html+='</tr>';for(var i=0;i<rondeItems.length;i++){html+='<tr><td style="text-align:left;">'+rondeItems[i].label+'</td><td>'+(rondeItems[i].deler||"")+'</td>';for(var p=0;p<4;p++)html+='<td>'+rondeItems[i].scores[p]+'</td>';html+='</tr>';}html+='<tr class="totalRow"><td style="text-align:left;">Totaal ronde '+rn+'</td><td></td>';for(var p=0;p<4;p++){html+=isWinnaar(rw,p)?'<td class="winnerCell">🏆 '+rondeTotaal[p]+'</td>':'<td>'+rondeTotaal[p]+'</td>';}html+='</tr>';if(rondeHeeftEuro){html+='<tr style="background:rgba(76,175,80,0.06);"><td style="text-align:left;">💰 Euro</td><td></td>';for(var p=0;p<4;p++){var cls=rondeEuro[p]>=0?"euroWinst":"euroVerlies";var tk=rondeEuro[p]>=0?"+":"−";html+='<td class="'+cls+'">'+tk+'€'+Math.abs(rondeEuro[p]).toFixed(2)+'</td>';}html+='</tr>';}html+='</table>';}}var dtWin=bepaalWinnaarIndexen(datumTotaal);html+='<div class="datumTotaal"><h4>Totaal '+dat+'</h4><table style="width:100%;"><tr>';for(var p=0;p<4;p++)html+='<th>'+playerNames[players[p]]+'</th>';html+='</tr><tr>';for(var p=0;p<4;p++){html+=isWinnaar(dtWin,p)?'<td class="winnerCell" style="font-weight:bold;">🏆 '+datumTotaal[p]+'</td>':'<td style="font-weight:bold;">'+datumTotaal[p]+'</td>';}html+='</tr>';if(datumHeeftEuro){html+='<tr>';for(var p=0;p<4;p++){var cls=datumEuro[p]>=0?"euroWinst":"euroVerlies";var tk=datumEuro[p]>=0?"+":"−";html+='<td class="'+cls+'" style="font-weight:bold;">'+tk+'€'+Math.abs(datumEuro[p]).toFixed(2)+'</td>';}html+='</tr>';}html+='</table></div></div>';}var ew=bepaalWinnaarIndexen(eindTotaal);var alleHeeftEuro=heeftEuroData(strafrondes);html+='<div class="grandTotal"><h3>Eindtotaal</h3><table style="width:100%;"><tr>';for(var p=0;p<4;p++)html+='<th>'+playerNames[players[p]]+'</th>';html+='</tr><tr>';for(var p=0;p<4;p++){html+=isWinnaar(ew,p)?'<td class="winnerCell" style="font-size:20px; font-weight:bold;">🏆 '+eindTotaal[p]+'</td>':'<td style="font-size:20px; font-weight:bold;">'+eindTotaal[p]+'</td>';}html+='</tr>';if(alleHeeftEuro){html+='<tr>';for(var p=0;p<4;p++){var cls=eindEuro[p]>=0?"euroWinst":"euroVerlies";var tk=eindEuro[p]>=0?"+":"−";html+='<td class="'+cls+'" style="font-size:18px; font-weight:bold;">'+tk+'€'+Math.abs(eindEuro[p]).toFixed(2)+'</td>';}html+='</tr>';}html+='</table></div>';}document.getElementById("overzichtContent").innerHTML=html;document.getElementById("overlay").style.display="block";}
 function sluitOverzicht(){document.getElementById("overlay").style.display="none";}
-
+// STATISTIEKEN
+function berekenStats(){var datums=[],perDatum={};for(var i=0;i<strafrondes.length;i++){var dat=strafrondes[i].datum||"onbekend";if(!perDatum[dat]){perDatum[dat]=[];datums.push(dat);}perDatum[dat].push(strafrondes[i]);}var rondes=[];for(var d=0;d<datums.length;d++){var dat=datums[d];var items=perDatum[dat];var rondeNrs=[];for(var i=0;i<items.length;i++){if(rondeNrs.indexOf(items[i].ronde)===-1)rondeNrs.push(items[i].ronde);}rondeNrs.sort(function(a,b){return a-b;});for(var r=0;r<rondeNrs.length;r++){var rn=rondeNrs[r];var totArr=[0,0,0,0];var cnt=0;var euroArr=[0,0,0,0];for(var i=0;i<items.length;i++){if(items[i].ronde!==rn)continue;cnt++;var epp=items[i].epp||0;for(var p=0;p<4;p++){totArr[p]+=items[i].scores[p];euroArr[p]+=items[i].scores[p]*epp;}}var wIdx=bepaalWinnaarIndexen(totArr);rondes.push({datum:dat,ronde:rn,totaal:totArr,euro:euroArr,aantalStrafrondes:cnt,winnaars:wIdx});}}var winsPerSpeler=[0,0,0,0];var totaalPerSpeler=[0,0,0,0];var besteRonde=[null,null,null,null];var slechtsteRonde=[null,null,null,null];var euroTotaal=[0,0,0,0];for(var r=0;r<rondes.length;r++){var ro=rondes[r];for(var p=0;p<4;p++){totaalPerSpeler[p]+=ro.totaal[p];euroTotaal[p]+=ro.euro[p];if(besteRonde[p]===null||ro.totaal[p]>besteRonde[p].score){besteRonde[p]={score:ro.totaal[p],datum:ro.datum,ronde:ro.ronde};}if(slechtsteRonde[p]===null||ro.totaal[p]<slechtsteRonde[p].score){slechtsteRonde[p]={score:ro.totaal[p],datum:ro.datum,ronde:ro.ronde};}}for(var w=0;w<ro.winnaars.length;w++){winsPerSpeler[ro.winnaars[w]]+=1/ro.winnaars.length;}}var streaks=[0,0,0,0];var maxStreaks=[0,0,0,0];for(var r=0;r<rondes.length;r++){var ro=rondes[r];for(var p=0;p<4;p++){if(isWinnaar(ro.winnaars,p)){streaks[p]++;if(streaks[p]>maxStreaks[p])maxStreaks[p]=streaks[p];}else{streaks[p]=0;}}}var dagWins=[0,0,0,0];for(var d=0;d<datums.length;d++){var dat=datums[d];var dt=[0,0,0,0];for(var i=0;i<perDatum[dat].length;i++)for(var p=0;p<4;p++)dt[p]+=perDatum[dat][i].scores[p];var dw=bepaalWinnaarIndexen(dt);for(var w=0;w<dw.length;w++)dagWins[dw[w]]+=1/dw.length;}return{aantalDatums:datums.length,aantalRondes:rondes.length,aantalStrafrondes:strafrondes.length,winsPerSpeler:winsPerSpeler,totaalPerSpeler:totaalPerSpeler,gemiddeld:rondes.length>0?totaalPerSpeler.map(function(t){return t/rondes.length;}):totaalPerSpeler,besteRonde:besteRonde,slechtsteRonde:slechtsteRonde,maxStreaks:maxStreaks,dagWins:dagWins,euroTotaal:euroTotaal,hasEuro:heeftEuroData(strafrondes)};}
+function toonStatistieken(){var s=berekenStats();if(s.aantalRondes===0){document.getElementById("statsContent").innerHTML="<p>Nog geen volledige rondes gespeeld. Speel eerst een paar rondes!</p>";document.getElementById("statsOverlay").style.display="block";return;}var kleuren=["#3498db","#e6a817","#e84393","#2ecc71"];var html="";html+='<div class="statCard"><h3>📋 Overzicht</h3><p>🗓️ <strong>'+s.aantalDatums+'</strong> speeldag'+(s.aantalDatums!==1?"en":"")+'&nbsp;&nbsp;|&nbsp;&nbsp;🔄 <strong>'+s.aantalRondes+'</strong> ronde'+(s.aantalRondes!==1?"s":"")+'&nbsp;&nbsp;|&nbsp;&nbsp;🃏 <strong>'+s.aantalStrafrondes+'</strong> strafrondes gespeeld</p></div>';var maxWins=Math.max.apply(null,s.winsPerSpeler);html+='<div class="statCard"><h3>🏆 Rondes gewonnen</h3><div class="statGrid">';for(var p=0;p<4;p++){var w=Math.round(s.winsPerSpeler[p]*10)/10;var pct=maxWins>0?(s.winsPerSpeler[p]/maxWins*100):0;var medal=s.winsPerSpeler[p]===maxWins&&maxWins>0?' 🥇':'';html+='<div><div class="statPlayer">'+playerNames[players[p]]+'</div><div class="statValue'+(s.winsPerSpeler[p]===maxWins&&maxWins>0?' statHighlight':'')+'">'+w+medal+'</div><div class="statBarContainer"><div class="statBar" style="width:'+pct+'%;background:'+kleuren[p]+';"></div></div><div class="statLabel">van '+s.aantalRondes+' rondes</div></div>';}html+='</div></div>';var maxDag=Math.max.apply(null,s.dagWins);html+='<div class="statCard"><h3>📅 Speeldagen gewonnen</h3><div class="statGrid">';for(var p=0;p<4;p++){var dw=Math.round(s.dagWins[p]*10)/10;var medal=s.dagWins[p]===maxDag&&maxDag>0?' 🥇':'';html+='<div><div class="statPlayer">'+playerNames[players[p]]+'</div><div class="statValue'+(s.dagWins[p]===maxDag&&maxDag>0?' statHighlight':'')+'">'+dw+medal+'</div><div class="statLabel">van '+s.aantalDatums+' dagen</div></div>';}html+='</div></div>';html+='<div class="statCard"><h3>📊 Gemiddelde score per ronde</h3><div class="statGrid">';var maxGem=Math.max.apply(null,s.gemiddeld);for(var p=0;p<4;p++){var g=s.gemiddeld[p].toFixed(1);html+='<div><div class="statPlayer">'+playerNames[players[p]]+'</div><div class="statValue'+(s.gemiddeld[p]===maxGem?' statHighlight':'')+'">'+g+'</div><div class="statLabel">per ronde</div></div>';}html+='</div></div>';html+='<div class="statCard"><h3>📈 Totaal punten</h3><div class="statGrid">';var maxTot=Math.max.apply(null,s.totaalPerSpeler);var minTot=Math.min.apply(null,s.totaalPerSpeler);for(var p=0;p<4;p++){var cls=s.totaalPerSpeler[p]===maxTot?' statHighlight':(s.totaalPerSpeler[p]===minTot?' statLow':'');html+='<div><div class="statPlayer">'+playerNames[players[p]]+'</div><div class="statValue'+cls+'">'+s.totaalPerSpeler[p]+'</div><div class="statLabel">totaal</div></div>';}html+='</div></div>';html+='<div class="statCard"><h3>🌟 Beste ronde</h3><div class="statGrid">';for(var p=0;p<4;p++){var br=s.besteRonde[p];html+='<div><div class="statPlayer">'+playerNames[players[p]]+'</div><div class="statValue statHighlight">'+(br?br.score:"-")+'</div><div class="statLabel">'+(br?br.datum+" R"+br.ronde:"-")+'</div></div>';}html+='</div></div>';html+='<div class="statCard"><h3>💀 Slechtste ronde</h3><div class="statGrid">';for(var p=0;p<4;p++){var sr=s.slechtsteRonde[p];html+='<div><div class="statPlayer">'+playerNames[players[p]]+'</div><div class="statValue statLow">'+(sr?sr.score:"-")+'</div><div class="statLabel">'+(sr?sr.datum+" R"+sr.ronde:"-")+'</div></div>';}html+='</div></div>';html+='<div class="statCard"><h3>🔥 Langste winstreak</h3><div class="statGrid">';var maxStreak=Math.max.apply(null,s.maxStreaks);for(var p=0;p<4;p++){html+='<div><div class="statPlayer">'+playerNames[players[p]]+'</div><div class="statValue'+(s.maxStreaks[p]===maxStreak&&maxStreak>0?' statHighlight':'')+'">'+s.maxStreaks[p]+'</div><div class="statLabel">rondes op rij</div></div>';}html+='</div></div>';if(s.hasEuro){html+='<div class="statCard"><h3>💰 Euro stand</h3><div class="statGrid">';for(var p=0;p<4;p++){var e=s.euroTotaal[p];var cls=e>=0?"euroWinst":"euroVerlies";var tk=e>=0?"+":"−";html+='<div><div class="statPlayer">'+playerNames[players[p]]+'</div><div class="statValue"><span class="'+cls+'">'+tk+'€'+Math.abs(e).toFixed(2)+'</span></div><div class="statLabel">totaal</div></div>';}html+='</div></div>';}document.getElementById("statsContent").innerHTML=html;document.getElementById("statsOverlay").style.display="block";}
+function sluitStatistieken(){document.getElementById("statsOverlay").style.display="none";}
+// OPSLAAN / LADEN
 function save(){localStorage.setItem("kingenData_v29",JSON.stringify({strafrondes:strafrondes,totals:totals,currentRonde:currentRonde,currentDatum:currentDatum,startDelerIndex:startDelerIndex,strafrondeNr:strafrondeNr,euroPerPunt:getEuroPerPunt()}));}
-function load(){var data=JSON.parse(localStorage.getItem("kingenData_v29")||"{}");strafrondes=data.strafrondes||[];totals={christophe:0,gunter:0,jessica:0,sandy:0};if(data.totals)for(var p=0;p<players.length;p++)if(data.totals[players[p]]!==undefined)totals[players[p]]=data.totals[players[p]];currentRonde=data.currentRonde||1;currentDatum=data.currentDatum||"";startDelerIndex=(data.startDelerIndex!==undefined&&data.startDelerIndex!==null)?data.startDelerIndex:-1;strafrondeNr=data.strafrondeNr||0;document.getElementById("euroPerPunt").value=data.euroPerPunt||0;var today=vandaag();if(currentDatum&&currentDatum!==today){currentDatum=today;currentRonde=1;strafrondeNr=0;startDelerIndex=-1;}if(!currentDatum)currentDatum=today;berekenTotalen();updateRondeLabel();herbouwTabel();updateTotalsUI();updateRondeTotaalUI();updateDelerUI();updateTroefButtons();updateLockUI();updateCancelBtn();updateEuroInfo();updateRestCounter();if(startDelerIndex>=0)autoSelectRound();}
-
-// PWA Service Worker
-if("serviceWorker" in navigator){navigator.serviceWorker.register("/Kingen/sw.js",{scope:"/Kingen/"}).catch(function(){});}
+function load(){var data=JSON.parse(localStorage.getItem("kingenData_v29")||"{}");strafrondes=data.strafrondes||[];totals={christophe:0,gunter:0,jessica:0,sandy:0};if(data.totals)for(var p=0;p<players.length;p++)if(data.totals[players[p]]!==undefined)totals[players[p]]=data.totals[players[p]];currentRonde=data.currentRonde||1;currentDatum=data.currentDatum||"";startDelerIndex=(data.startDelerIndex!==undefined&&data.startDelerIndex!==null)?data.startDelerIndex:-1;strafrondeNr=data.strafrondeNr||0;document.getElementById("euroPerPunt").value=data.euroPerPunt||0;var today=vandaag();if(currentDatum&&currentDatum!==today){currentDatum=today;currentRonde=1;strafrondeNr=0;startDelerIndex=-1;}if(!currentDatum)currentDatum=today;berekenTotalen();updateRondeLabel();herbouwTabel();updateTotalsUI();updateRondeTotaalUI();updateDelerUI();updateTroefButtons();updateLockUI();updateCancelBtn();updateSpelregelsBtn();updateEuroInfo();updateRestCounter();if(startDelerIndex>=0)autoSelectRound();}
+// START
+load();
+requestWakeLock();
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(function(){});}
 </script>
 </body>
 </html>
