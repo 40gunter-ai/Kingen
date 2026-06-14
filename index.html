@@ -103,7 +103,6 @@ td, th { border: 1px solid white; padding: 8px; }
 .regelTabel td, .regelTabel th { border: 1px solid rgba(255,255,255,0.2); padding: 8px 10px; text-align: left; }
 .regelTabel th { background: rgba(255,255,255,0.08); color: #e6a817; }
 .regelTabel tr:nth-child(even) { background: rgba(255,255,255,0.03); }
-/* RONDENUMMER KNOPPEN */
 .rondeNrBtn { padding: 4px 10px; font-size: 16px; font-weight: bold; background-color: #e65100; border: none; border-radius: 8px; color: white; cursor: pointer; min-width: 32px; margin: 0 2px; }
 .rondeNrBtn:hover { background-color: #ff6d00; }
 </style>
@@ -152,8 +151,8 @@ td, th { border: 1px solid white; padding: 8px; }
     <div class="row">
         <button class="contract locked" id="btn_least" onclick="selectRound('least', this)">Minste slagen</button>
         <button class="contract locked" id="btn_hearts" onclick="selectRound('hearts', this)">Harten</button>
-        <button class="contract locked" id="btn_queens" onclick="selectRound('queens', this)">Dames</button>
         <button class="contract locked" id="btn_mix" onclick="selectRound('mix', this)">Heren en boeren</button>
+        <button class="contract locked" id="btn_queens" onclick="selectRound('queens', this)">Dames</button>
         <button class="contract locked" id="btn_kingHeart" onclick="selectRound('kingHeart', this)">Harten heer</button>
         <button class="contract locked" id="btn_sevenlast" onclick="selectRound('sevenlast', this)">7de &amp; laatste</button>
     </div>
@@ -231,7 +230,7 @@ td, th { border: 1px solid white; padding: 8px; }
         </div>
         <div class="regelBlock"><h3>🃏 Overzicht</h3><p>Kingen wordt gespeeld met <strong>4 spelers</strong> en een <strong>standaard kaartspel van 52 kaarten</strong>. Elke ronde bestaat uit <strong>10 strafrondes</strong>: 6 strafrondes + 4 troefrondes. Elke speler krijgt <strong>13 kaarten</strong>.</p><p>De speler met de <strong>hoogste totaalscore</strong> (minst negatief) aan het einde wint!</p></div>
         <div class="regelBlock"><h3>🔄 Deler</h3><p>Bij het begin van een ronde wordt een <strong>eerste deler</strong> gekozen. De beurt om te delen schuift elke strafronde <strong>met de klok mee</strong> door naar de volgende speler.</p><p>De speler <strong>links van de deler</strong> speelt de eerste kaart (komt uit).</p></div>
-        <div class="regelBlock"><h3>⛔ Strafrondes (ronde 1–6)</h3><p>Bij strafrondes krijg je <strong>minpunten</strong>. Het doel is om zo weinig mogelijk strafpunten te pakken.</p><table class="regelTabel"><tr><th>#</th><th>Strafronde</th><th>Straf</th><th>Totaal</th></tr><tr><td>1</td><td>Minste slagen</td><td><strong>-1</strong> per gewonnen slag</td><td>-13</td></tr><tr><td>2</td><td>Harten</td><td><strong>-1</strong> per hartkaart in je slagen</td><td>-13</td></tr><tr><td>3</td><td>Dames</td><td><strong>-2</strong> per dame in je slagen</td><td>-8</td></tr><tr><td>4</td><td>Heren en boeren</td><td><strong>-1</strong> per heer of boer in je slagen</td><td>-8</td></tr><tr><td>5</td><td>Harten heer</td><td><strong>-5</strong> voor wie de harten heer pakt</td><td>-5</td></tr><tr><td>6</td><td>7de &amp; laatste</td><td><strong>-2</strong> voor de 7de slag, <strong>-3</strong> voor de laatste (13de) slag</td><td>-5</td></tr></table></div>
+        <div class="regelBlock"><h3>⛔ Strafrondes (ronde 1–6)</h3><p>Bij strafrondes krijg je <strong>minpunten</strong>. Het doel is om zo weinig mogelijk strafpunten te pakken.</p><table class="regelTabel"><tr><th>#</th><th>Strafronde</th><th>Straf</th><th>Totaal</th></tr><tr><td>1</td><td>Minste slagen</td><td><strong>-1</strong> per gewonnen slag</td><td>-13</td></tr><tr><td>2</td><td>Harten</td><td><strong>-1</strong> per hartkaart in je slagen</td><td>-13</td></tr><tr><td>3</td><td>Heren en boeren</td><td><strong>-1</strong> per heer of boer in je slagen</td><td>-8</td></tr><tr><td>4</td><td>Dames</td><td><strong>-2</strong> per dame in je slagen</td><td>-8</td></tr><tr><td>5</td><td>Harten heer</td><td><strong>-5</strong> voor wie de harten heer pakt</td><td>-5</td></tr><tr><td>6</td><td>7de &amp; laatste</td><td><strong>-2</strong> voor de 7de slag, <strong>-3</strong> voor de laatste (13de) slag</td><td>-5</td></tr></table></div>
         <div class="regelBlock"><h3>🏆 Troefrondes (ronde 7–10)</h3><p>Bij troefrondes krijg je <strong>pluspunten</strong>. Het doel is om zoveel mogelijk slagen te winnen.</p><table class="regelTabel"><tr><th>#</th><th>Troefronde</th><th>Punten</th><th>Totaal</th></tr><tr><td>7</td><td>Troefronde 7</td><td><strong>+1</strong> per gewonnen slag</td><td>+13</td></tr><tr><td>8</td><td>Troefronde 8</td><td><strong>+1</strong> per gewonnen slag</td><td>+13</td></tr><tr><td>9</td><td>Troefronde 9</td><td><strong>+1</strong> per gewonnen slag</td><td>+13</td></tr><tr><td>10</td><td>Troefronde 10</td><td><strong>+1</strong> per gewonnen slag</td><td>+13</td></tr></table><p>Bij elke troefronde kiest de <strong>deler</strong> de troefkleur (♠ ♥ ♦ ♣). Troef wint altijd van andere kleuren.</p></div>
         <div class="regelBlock"><h3>📏 Basisregels</h3><ul><li>Je moet altijd <strong>kleur bekennen</strong> (dezelfde kleur bijleggen als de uitgespeelde kaart).</li><li>Kun je niet kleur bekennen? Dan mag je een <strong>andere kleur</strong> bijleggen (of troef bij troefrondes).</li><li>De <strong>hoogste kaart</strong> van de uitgespeelde kleur wint de slag (of de hoogste troef als er troef is gespeeld).</li><li>De winnaar van een slag speelt de <strong>volgende kaart</strong> uit.</li></ul></div>
         <div class="regelBlock"><h3>🔢 Kaartwaarde (hoog → laag)</h3><p><strong>Aas</strong> (hoogste) → Heer → Dame → Boer → 10 → 9 → 8 → 7 → 6 → 5 → 4 → 3 → <strong>2</strong> (laagste)</p></div>
@@ -248,7 +247,7 @@ document.addEventListener("visibilitychange",function(){if(document.visibilitySt
 // APP
 var players=["christophe","gunter","jessica","sandy"];
 var playerNames={christophe:"Christoph",gunter:"Gunter",jessica:"Jess",sandy:"Sandy"};
-var rondeVolgorde=["least","hearts","queens","mix","kingHeart","sevenlast","troef1","troef2","troef3","troef4"];
+var rondeVolgorde=["least","hearts","mix","queens","kingHeart","sevenlast","troef1","troef2","troef3","troef4"];
 var rules={least:-1,hearts:-1,queens:-2,mix:-1,kingHeart:-5,troef1:1,troef2:1,troef3:1,troef4:1};
 var sevenLastRules={seventh:-2,last:-3};
 var baseRoundLabels={least:"Minste slagen",hearts:"Harten",queens:"Dames",mix:"Heren en boeren",kingHeart:"Harten heer",sevenlast:"7de & laatste"};
@@ -274,35 +273,8 @@ function updateCancelBtn(){document.getElementById("cancelBtn").style.display=ad
 function updateSpelregelsBtn(){document.getElementById("spelregelsBtn").style.display=adminMode?"inline-block":"none";}
 function toonSpelregels(){document.getElementById("spelregelsOverlay").style.display="block";}
 function sluitSpelregels(){document.getElementById("spelregelsOverlay").style.display="none";}
-
-// RONDENUMMER AANPASSEN (admin-only)
-function updateRondeNrControls(){
-    var vis=adminMode?"inline-block":"none";
-    document.getElementById("rondeNrMin").style.display=vis;
-    document.getElementById("rondeNrPlus").style.display=vis;
-}
-function wijzigRondeNr(dir){
-    var nieuw=currentRonde+dir;
-    if(nieuw<1)nieuw=1;
-    currentRonde=nieuw;
-    strafrondeNr=telStrafrondesHuidigeRonde();
-    current=null;selected=null;
-    updateRondeLabel();
-    herbouwTabel();
-    updateRondeTotaalUI();
-    updateModeText();
-    updateTapScores();
-    updateRestCounter();
-    updateDelerUI();
-    updateTroefButtons();
-    updateLockUI();
-    document.getElementById("tapBox").style.display="none";
-    document.getElementById("subBox").style.display="none";
-    document.getElementById("completeMsg").style.display="none";
-    save();
-    if(startDelerIndex>=0)autoSelectRound();
-}
-
+function updateRondeNrControls(){var vis=adminMode?"inline-block":"none";document.getElementById("rondeNrMin").style.display=vis;document.getElementById("rondeNrPlus").style.display=vis;}
+function wijzigRondeNr(dir){var nieuw=currentRonde+dir;if(nieuw<1)nieuw=1;currentRonde=nieuw;strafrondeNr=telStrafrondesHuidigeRonde();current=null;selected=null;updateRondeLabel();herbouwTabel();updateRondeTotaalUI();updateModeText();updateTapScores();updateRestCounter();updateDelerUI();updateTroefButtons();updateLockUI();document.getElementById("tapBox").style.display="none";document.getElementById("subBox").style.display="none";document.getElementById("completeMsg").style.display="none";save();if(startDelerIndex>=0)autoSelectRound();}
 function isTroef(t){return t==="troef1"||t==="troef2"||t==="troef3"||t==="troef4";}
 function delerIndexVoorPositie(pos){if(startDelerIndex<0)return -1;return(startDelerIndex+pos)%players.length;}
 function huidigeDelerIndex(){return delerIndexVoorPositie(strafrondeNr);}
