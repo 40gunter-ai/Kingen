@@ -357,8 +357,92 @@ function nieuweRonde(){var today=vandaag();var nieuwNr,tekst;if(today!==currentD
 function undoStrafRonde(){if(strafrondes.length===0)return;var last=strafrondes[strafrondes.length-1];if(last.ronde!==currentRonde||last.datum!==currentDatum){alert("Geen rondes om ongedaan te maken in deze ronde.");return;}strafrondes.pop();for(var p=0;p<players.length;p++)totals[players[p]]-=last.scores[p];strafrondeNr=telStrafrondesHuidigeRonde();herbouwTabel();updateTotalsUI();updateRondeTotaalUI();updateDelerUI();save();autoSelectRound();}
 function resetGame(){if(!confirm("Volledige ronde resetten?\n(Score overzicht blijft behouden)"))return;currentRonde++;startDelerIndex=-1;strafrondeNr=0;current=null;selected=null;verbergError();adminMode=false;document.getElementById("adminBtn").classList.remove("adminActive");document.getElementById("adminBtn").innerText="🔓 Administrator";updateCancelBtn();updateSpelregelsBtn();document.getElementById("tapBox").style.display="none";document.getElementById("subBox").style.display="none";document.getElementById("completeMsg").style.display="none";var allBtns=document.querySelectorAll(".contract, .troef");for(var i=0;i<allBtns.length;i++){allBtns[i].classList.remove("active");allBtns[i].classList.remove("played");}updateRondeLabel();herbouwTabel();updateModeText();updateTotalsUI();updateRondeTotaalUI();updateTapScores();updateRestCounter();updateDelerUI();updateTroefButtons();updateLockUI();save();}
 function wisRonde(datum,rondeNr){if(!confirm("Ronde "+rondeNr+" ("+datum+") volledig wissen?\nDit kan niet ongedaan gemaakt worden."))return;strafrondes=strafrondes.filter(function(sr){return!(sr.datum===datum&&sr.ronde===rondeNr);});var oudeNummers=[];for(var i=0;i<strafrondes.length;i++){if(strafrondes[i].datum===datum&&oudeNummers.indexOf(strafrondes[i].ronde)===-1)oudeNummers.push(strafrondes[i].ronde);}oudeNummers.sort(function(a,b){return a-b;});var mapping={};for(var i=0;i<oudeNummers.length;i++)mapping[oudeNummers[i]]=i+1;for(var i=0;i<strafrondes.length;i++){if(strafrondes[i].datum===datum&&mapping[strafrondes[i].ronde]!==undefined)strafrondes[i].ronde=mapping[strafrondes[i].ronde];}if(datum===currentDatum){if(mapping[currentRonde]!==undefined)currentRonde=mapping[currentRonde];else{currentRonde=oudeNummers.length+1;if(currentRonde<1)currentRonde=1;}}berekenTotalen();strafrondeNr=telStrafrondesHuidigeRonde();updateRondeLabel();herbouwTabel();updateTotalsUI();updateRondeTotaalUI();updateDelerUI();updateTroefButtons();save();toonOverzicht();}
-function exportExcel(){var sep=";";var rows=[];var hasEuro=heeftEuroData(strafrondes);var header=["Datum","Ronde","Type","Deler"];for(var p=0;p<4;p++)header.push(playerNames[players[p]]);header.push("Winnaar");if(hasEuro){header.push("€/punt");for(var p=0;p<4;p++)header.push("€ "+playerNames[players[p]]);}rows.push(header.join(sep));var datums=[],perDatum={};for(var i=0;i<strafrondes.length;i++){var dat=strafrondes[i].datum||"onbekend";if(!perDatum[dat]){perDatum[dat]=[];datums.push(dat);}perDatum[dat].push(strafrondes[i]);}var eindTotaal=[0,0,0,0];var eindEuro=[0,0,0,0];for(var d=0;d<datums.length;d++){var dat=datums[d];var items=perDatum[dat];var datumTotaal=[0,0,0,0];var datumEuro=[0,0,0,0];var rondesInDatum=[];for(var i=0;i<items.length;i++){if(rondesInDatum.indexOf(items[i].ronde)===-1)rondesInDatum.push(items[i].ronde);}rondesInDatum.sort(function(a,b){return a-b;});for(var r=0;r<rondesInDatum.length;r++){var rn=rondesInDatum[r];var rondeTotaal=[0,0,0,0];var rondeEuro=[0,0,0,0];for(var i=0;i<items.length;i++){if(items[i].ronde!==rn)continue;var rij=[dat,rn,items[i].label,items[i].deler||""];var epp=items[i].epp||0;for(var p=0;p<4;p++){rij.push(items[i].scores[p]);rondeTotaal[p]+=items[i].scores[p];rondeEuro[p]+=items[i].scores[p]*epp;}rij.push("");if(hasEuro){rij.push(epp.toFixed(2));for(var p=0;p<4;p++)rij.push((items[i].scores[p]*epp).toFixed(2));}rows.push(rij.join(sep));}var rw=bepaalWinnaarIndexen(rondeTotaal);var totRij=[dat,rn,"TOTAAL RONDE "+rn,""];for(var p=0;p<4;p++){totRij.push(rondeTotaal[p]);datumTotaal[p]+=rondeTotaal[p];datumEuro[p]+=rondeEuro[p];}totRij.push(winnaarNamen(rw)+" \uD83C\uDFC6");if(hasEuro){totRij.push("");for(var p=0;p<4;p++)totRij.push(rondeEuro[p].toFixed(2));}rows.push(totRij.join(sep));rows.push("");}var dw=bepaalWinnaarIndexen(datumTotaal);var datRij=[dat,"","TOTAAL "+dat,""];for(var p=0;p<4;p++){datRij.push(datumTotaal[p]);eindTotaal[p]+=datumTotaal[p];eindEuro[p]+=datumEuro[p];}datRij.push(winnaarNamen(dw)+" \uD83C\uDFC6");if(hasEuro){datRij.push("");for(var p=0;p<4;p++)datRij.push(datumEuro[p].toFixed(2));}rows.push(datRij.join(sep));rows.push("");}var ew=bepaalWinnaarIndexen(eindTotaal);var eindRij=["","","EINDTOTAAL",""];for(var p=0;p<4;p++)eindRij.push(eindTotaal[p]);eindRij.push(winnaarNamen(ew)+" \uD83C\uDFC6");if(hasEuro){eindRij.push("");for(var p=0;p<4;p++)eindRij.push(eindEuro[p].toFixed(2));}rows.push(eindRij.join(sep));var csvContent="\uFEFF"+rows.join("\n");var blob=new Blob([csvContent],{type:"text/csv;charset=utf-8;"});var url=URL.createObjectURL(blob);var a=document.createElement("a");a.href=url;a.download="kingen_scores_"+vandaag().replace(/\//g,"-")+".csv";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
-function toggleDatum(datum){if(openDatums[datum]===undefined)openDatums[datum]=false;else openDatums[datum]=!openDatums[datum];toonOverzicht();}
+function exportExcel(){
+    var datums=[],perDatum={};
+    for(var i=0;i<strafrondes.length;i++){var dat=strafrondes[i].datum||"onbekend";if(!perDatum[dat]){perDatum[dat]=[];datums.push(dat);}perDatum[dat].push(strafrondes[i]);}
+    if(datums.length===0){alert("Geen data om te exporteren.");return;}
+    var hasEuro=heeftEuroData(strafrondes);
+    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+    function sCell(v,st){return '<Cell'+(st?' ss:StyleID="'+st+'"':'')+'><Data ss:Type="String">'+esc(v)+'</Data></Cell>';}
+    function nCell(v,st){return '<Cell'+(st?' ss:StyleID="'+st+'"':'')+'><Data ss:Type="Number">'+v+'</Data></Cell>';}
+    var xml='<?xml version="1.0" encoding="UTF-8"?>\n<?mso-application progid="Excel.Sheet"?>\n';
+    xml+='<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\n';
+    xml+='<Styles>\n';
+    xml+='<Style ss:ID="Default"><Font ss:Size="11" ss:FontName="Arial"/></Style>\n';
+    xml+='<Style ss:ID="hdr"><Font ss:Size="11" ss:FontName="Arial" ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#1F4E8C" ss:Pattern="Solid"/></Style>\n';
+    xml+='<Style ss:ID="tot"><Font ss:Size="11" ss:FontName="Arial" ss:Bold="1"/><Interior ss:Color="#FFF3CD" ss:Pattern="Solid"/></Style>\n';
+    xml+='<Style ss:ID="dag"><Font ss:Size="12" ss:FontName="Arial" ss:Bold="1"/><Interior ss:Color="#E6A817" ss:Pattern="Solid"/></Style>\n';
+    xml+='<Style ss:ID="win"><Font ss:Size="11" ss:FontName="Arial" ss:Bold="1" ss:Color="#2D8A62"/><Interior ss:Color="#D4EDDA" ss:Pattern="Solid"/></Style>\n';
+    xml+='<Style ss:ID="eP"><Font ss:Size="11" ss:FontName="Arial" ss:Bold="1" ss:Color="#2D8A62"/></Style>\n';
+    xml+='<Style ss:ID="eM"><Font ss:Size="11" ss:FontName="Arial" ss:Bold="1" ss:Color="#B33A3A"/></Style>\n';
+    xml+='<Style ss:ID="ePhdr"><Font ss:Size="11" ss:FontName="Arial" ss:Bold="1" ss:Color="#2D8A62"/><Interior ss:Color="#FFF3CD" ss:Pattern="Solid"/></Style>\n';
+    xml+='<Style ss:ID="eMhdr"><Font ss:Size="11" ss:FontName="Arial" ss:Bold="1" ss:Color="#B33A3A"/><Interior ss:Color="#FFF3CD" ss:Pattern="Solid"/></Style>\n';
+    xml+='<Style ss:ID="ePdag"><Font ss:Size="12" ss:FontName="Arial" ss:Bold="1" ss:Color="#2D8A62"/><Interior ss:Color="#E6A817" ss:Pattern="Solid"/></Style>\n';
+    xml+='<Style ss:ID="eMdag"><Font ss:Size="12" ss:FontName="Arial" ss:Bold="1" ss:Color="#B33A3A"/><Interior ss:Color="#E6A817" ss:Pattern="Solid"/></Style>\n';
+    xml+='</Styles>\n';
+    var eindTotaal=[0,0,0,0],eindEuro=[0,0,0,0];
+    for(var d=0;d<datums.length;d++){
+        var dat=datums[d],items=perDatum[dat],sn=dat.replace(/\//g,'-');
+        xml+='<Worksheet ss:Name="'+esc(sn)+'">\n<Table>\n';
+        xml+='<Column ss:Width="160"/><Column ss:Width="100"/>';
+        for(var p=0;p<4;p++)xml+='<Column ss:Width="90"/>';
+        if(hasEuro){xml+='<Column ss:Width="70"/>';for(var p=0;p<4;p++)xml+='<Column ss:Width="100"/>';}
+        xml+='\n';
+        xml+='<Row>'+sCell('Type','hdr')+sCell('Deler','hdr');
+        for(var p=0;p<4;p++)xml+=sCell(playerNames[players[p]],'hdr');
+        if(hasEuro){xml+=sCell('\u20AC/punt','hdr');for(var p=0;p<4;p++)xml+=sCell('\u20AC '+playerNames[players[p]],'hdr');}
+        xml+='</Row>\n';
+        var rondesInDatum=[];for(var i=0;i<items.length;i++){if(rondesInDatum.indexOf(items[i].ronde)===-1)rondesInDatum.push(items[i].ronde);}
+        rondesInDatum.sort(function(a,b){return a-b;});
+        var datumTotaal=[0,0,0,0],datumEuro=[0,0,0,0];
+        for(var r=0;r<rondesInDatum.length;r++){
+            var rn=rondesInDatum[r],rondeTotaal=[0,0,0,0],rondeEuro=[0,0,0,0];
+            for(var i=0;i<items.length;i++){
+                if(items[i].ronde!==rn)continue;
+                var epp=items[i].epp||0;
+                xml+='<Row>'+sCell(items[i].label)+sCell(items[i].deler||'');
+                for(var p=0;p<4;p++){xml+=nCell(items[i].scores[p]);rondeTotaal[p]+=items[i].scores[p];rondeEuro[p]+=items[i].scores[p]*epp;}
+                if(hasEuro){xml+=nCell(epp);for(var p=0;p<4;p++){var ev=items[i].scores[p]*epp;xml+=nCell(Math.round(ev*100)/100,ev>=0?'eP':'eM');}}
+                xml+='</Row>\n';
+            }
+            var rw=bepaalWinnaarIndexen(rondeTotaal);
+            xml+='<Row>'+sCell('Totaal ronde '+rn,'tot')+sCell('','tot');
+            for(var p=0;p<4;p++){xml+=nCell(rondeTotaal[p],isWinnaar(rw,p)?'win':'tot');datumTotaal[p]+=rondeTotaal[p];datumEuro[p]+=rondeEuro[p];}
+            if(hasEuro){xml+=sCell('','tot');for(var p=0;p<4;p++){xml+=nCell(Math.round(rondeEuro[p]*100)/100,rondeEuro[p]>=0?'ePhdr':'eMhdr');}}
+            xml+='</Row>\n<Row></Row>\n';
+        }
+        var dw=bepaalWinnaarIndexen(datumTotaal);
+        xml+='<Row>'+sCell('TOTAAL '+dat,'dag')+sCell('','dag');
+        for(var p=0;p<4;p++){xml+=nCell(datumTotaal[p],isWinnaar(dw,p)?'win':'dag');eindTotaal[p]+=datumTotaal[p];eindEuro[p]+=datumEuro[p];}
+        if(hasEuro){xml+=sCell('','dag');for(var p=0;p<4;p++){xml+=nCell(Math.round(datumEuro[p]*100)/100,datumEuro[p]>=0?'ePdag':'eMdag');}}
+        xml+='</Row>\n</Table>\n</Worksheet>\n';
+    }
+    xml+='<Worksheet ss:Name="Eindtotaal">\n<Table>\n';
+    xml+='<Column ss:Width="140"/>';for(var p=0;p<4;p++)xml+='<Column ss:Width="90"/>';
+    if(hasEuro)for(var p=0;p<4;p++)xml+='<Column ss:Width="100"/>';
+    xml+='\n<Row>'+sCell('Speeldag','hdr');
+    for(var p=0;p<4;p++)xml+=sCell(playerNames[players[p]],'hdr');
+    if(hasEuro)for(var p=0;p<4;p++)xml+=sCell('\u20AC '+playerNames[players[p]],'hdr');
+    xml+='</Row>\n';
+    for(var d=0;d<datums.length;d++){
+        var dat=datums[d],dt=[0,0,0,0],de=[0,0,0,0];
+        for(var i=0;i<perDatum[dat].length;i++){var epp=perDatum[dat][i].epp||0;for(var p=0;p<4;p++){dt[p]+=perDatum[dat][i].scores[p];de[p]+=perDatum[dat][i].scores[p]*epp;}}
+        var dw=bepaalWinnaarIndexen(dt);
+        xml+='<Row>'+sCell(dat);
+        for(var p=0;p<4;p++)xml+=nCell(dt[p],isWinnaar(dw,p)?'win':'');
+        if(hasEuro)for(var p=0;p<4;p++){xml+=nCell(Math.round(de[p]*100)/100,de[p]>=0?'eP':'eM');}
+        xml+='</Row>\n';
+    }
+    var ew=bepaalWinnaarIndexen(eindTotaal);
+    xml+='<Row>'+sCell('EINDTOTAAL','dag');
+    for(var p=0;p<4;p++)xml+=nCell(eindTotaal[p],isWinnaar(ew,p)?'win':'dag');
+    if(hasEuro)for(var p=0;p<4;p++){xml+=nCell(Math.round(eindEuro[p]*100)/100,eindEuro[p]>=0?'ePdag':'eMdag');}
+    xml+='</Row>\n</Table>\n</Worksheet>\n</Workbook>';
+    var blob=new Blob([xml],{type:'application/vnd.ms-excel'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');a.href=url;a.download='kingen_scores_'+vandaag().replace(/\//g,'-')+'.xls';
+    document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+}function toggleDatum(datum){if(openDatums[datum]===undefined)openDatums[datum]=false;else openDatums[datum]=!openDatums[datum];toonOverzicht();}
 function toonOverzicht(){var html="";var datums=[],perDatum={};for(var i=0;i<strafrondes.length;i++){var dat=strafrondes[i].datum||"onbekend";if(!perDatum[dat]){perDatum[dat]=[];datums.push(dat);}perDatum[dat].push(strafrondes[i]);}if(datums.length===0){html="<p>Nog geen rondes gespeeld.</p>";}else{var eindTotaal=[0,0,0,0];var eindEuro=[0,0,0,0];for(var d=0;d<datums.length;d++){var dat=datums[d];var items=perDatum[dat];var isOpen=(openDatums[dat]===undefined)?true:openDatums[dat];var datumTotaal=[0,0,0,0];var datumEuro=[0,0,0,0];for(var i=0;i<items.length;i++){var epp=items[i].epp||0;for(var p=0;p<4;p++){datumTotaal[p]+=items[i].scores[p];datumEuro[p]+=items[i].scores[p]*epp;}}for(var p=0;p<4;p++){eindTotaal[p]+=datumTotaal[p];eindEuro[p]+=datumEuro[p];}var datumHeeftEuro=heeftEuroData(items);html+='<div class="roundBlock">';html+='<div class="datumHeader" onclick="toggleDatum(\''+dat+'\')">';html+='<h3 style="margin:0;">'+(isOpen?'▼':'▶')+' '+dat+'</h3>';html+='<span class="datumToggle">('+items.length+' rondes)</span></div>';if(isOpen){var rondesInDatum=[];for(var i=0;i<items.length;i++){if(rondesInDatum.indexOf(items[i].ronde)===-1)rondesInDatum.push(items[i].ronde);}rondesInDatum.sort(function(a,b){return a-b;});for(var r=0;r<rondesInDatum.length;r++){var rn=rondesInDatum[r];var rondeTotaal=[0,0,0,0];var rondeEuro=[0,0,0,0];var rondeItems=[];for(var i=0;i<items.length;i++){if(items[i].ronde!==rn)continue;rondeItems.push(items[i]);var epp=items[i].epp||0;for(var p=0;p<4;p++){rondeTotaal[p]+=items[i].scores[p];rondeEuro[p]+=items[i].scores[p]*epp;}}var rw=bepaalWinnaarIndexen(rondeTotaal);var rondeHeeftEuro=heeftEuroData(rondeItems);html+='<div class="rondeHeader"><span>Ronde '+rn+'</span>';html+='<button class="wisRondeBtn" onclick="event.stopPropagation(); wisRonde(\''+dat+'\','+rn+')">🗑 Wis ronde '+rn+'</button></div>';html+='<table style="width:100%;"><tr><th style="text-align:left;">Type</th><th>Deler</th>';for(var p=0;p<4;p++)html+='<th>'+playerNames[players[p]]+'</th>';html+='</tr>';for(var i=0;i<rondeItems.length;i++){html+='<tr><td style="text-align:left;">'+rondeItems[i].label+'</td><td>'+(rondeItems[i].deler||"")+'</td>';for(var p=0;p<4;p++)html+='<td>'+rondeItems[i].scores[p]+'</td>';html+='</tr>';}html+='<tr class="totalRow"><td style="text-align:left;">Totaal ronde '+rn+'</td><td></td>';for(var p=0;p<4;p++){html+=isWinnaar(rw,p)?'<td class="winnerCell">🏆 '+rondeTotaal[p]+'</td>':'<td>'+rondeTotaal[p]+'</td>';}html+='</tr>';if(rondeHeeftEuro){html+='<tr style="background:rgba(76,175,80,0.06);"><td style="text-align:left;">💰 Euro</td><td></td>';for(var p=0;p<4;p++){var cls=rondeEuro[p]>=0?"euroWinst":"euroVerlies";var tk=rondeEuro[p]>=0?"+":"−";html+='<td class="'+cls+'">'+tk+'€'+Math.abs(rondeEuro[p]).toFixed(2)+'</td>';}html+='</tr>';}html+='</table>';}}var dtWin=bepaalWinnaarIndexen(datumTotaal);html+='<div class="datumTotaal"><h4>Totaal '+dat+'</h4><table style="width:100%;"><tr>';for(var p=0;p<4;p++)html+='<th>'+playerNames[players[p]]+'</th>';html+='</tr><tr>';for(var p=0;p<4;p++){html+=isWinnaar(dtWin,p)?'<td class="winnerCell" style="font-weight:bold;">🏆 '+datumTotaal[p]+'</td>':'<td style="font-weight:bold;">'+datumTotaal[p]+'</td>';}html+='</tr>';if(datumHeeftEuro){html+='<tr>';for(var p=0;p<4;p++){var cls=datumEuro[p]>=0?"euroWinst":"euroVerlies";var tk=datumEuro[p]>=0?"+":"−";html+='<td class="'+cls+'" style="font-weight:bold;">'+tk+'€'+Math.abs(datumEuro[p]).toFixed(2)+'</td>';}html+='</tr>';}html+='</table></div></div>';}var ew=bepaalWinnaarIndexen(eindTotaal);var alleHeeftEuro=heeftEuroData(strafrondes);html+='<div class="grandTotal"><h3>Eindtotaal</h3><table style="width:100%;"><tr>';for(var p=0;p<4;p++)html+='<th>'+playerNames[players[p]]+'</th>';html+='</tr><tr>';for(var p=0;p<4;p++){html+=isWinnaar(ew,p)?'<td class="winnerCell" style="font-size:20px; font-weight:bold;">🏆 '+eindTotaal[p]+'</td>':'<td style="font-size:20px; font-weight:bold;">'+eindTotaal[p]+'</td>';}html+='</tr>';if(alleHeeftEuro){html+='<tr>';for(var p=0;p<4;p++){var cls=eindEuro[p]>=0?"euroWinst":"euroVerlies";var tk=eindEuro[p]>=0?"+":"−";html+='<td class="'+cls+'" style="font-size:18px; font-weight:bold;">'+tk+'€'+Math.abs(eindEuro[p]).toFixed(2)+'</td>';}html+='</tr>';}html+='</table></div>';}document.getElementById("overzichtContent").innerHTML=html;document.getElementById("overlay").style.display="block";}
 function sluitOverzicht(){document.getElementById("overlay").style.display="none";}
 // STATISTIEKEN
