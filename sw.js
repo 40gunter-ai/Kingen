@@ -1,4 +1,4 @@
-var CACHE_NAME = 'kingen-v5';
+var CACHE_NAME = 'kingen-v6';
 var GHPATH = '/Kingen';
 var urlsToCache = [
   GHPATH + '/',
